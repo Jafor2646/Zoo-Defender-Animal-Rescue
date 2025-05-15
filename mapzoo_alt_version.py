@@ -1004,6 +1004,8 @@ def keyboardListener(key, x, y):
                     break
 def specialKeyListener(key, x, y):
     global camera_pos, camera_angle
+    DEFAULT_CAM_Y = 500
+    DEFAULT_CAM_Z = 350
     
     # Camera rotation
     if key == GLUT_KEY_LEFT:
@@ -1017,7 +1019,10 @@ def specialKeyListener(key, x, y):
         camera_pos = (camera_pos[0], camera_pos[1] - 20, camera_pos[2] - 20)
     
     if key == GLUT_KEY_DOWN:
-        camera_pos = (camera_pos[0], camera_pos[1] + 20, camera_pos[2] + 20)
+        # Only allow zooming out up to the default camera position
+        new_y = min(camera_pos[1] + 20, DEFAULT_CAM_Y)
+        new_z = min(camera_pos[2] + 20, DEFAULT_CAM_Z)
+        camera_pos = (camera_pos[0], new_y, new_z)
 
 def mouseListener(button, state, x, y):
     global selected_animal_index, shoot_cooldown
