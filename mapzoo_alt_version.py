@@ -281,12 +281,11 @@ class Dart:
         if time.time() > self.life_time:
             self.active = False
         
-        # Check collision with poachers
+        # Check collision with poachers (use only X/Y distance)
         for poacher in poachers:
             if poacher.active and not poacher.captured:
                 dist = math.sqrt((self.pos[0] - poacher.pos[0])**2 + 
-                                (self.pos[1] - poacher.pos[1])**2 + 
-                                (self.pos[2] - poacher.pos[2])**2)
+                                (self.pos[1] - poacher.pos[1])**2)
                 if dist < 30:  # Hit detection radius
                     poacher.captured = True
                     self.active = False
@@ -966,7 +965,13 @@ def keyboardListener(key, x, y):
         
     # Switch camera mode
     if key == b'c':
-        camera_mode = "first_person" if camera_mode == "third_person" else "third_person"
+        if camera_mode == "third_person":
+            camera_mode = "first_person"
+        else:
+            camera_mode = "third_person"
+            # Reset camera position to default when switching back
+            global camera_pos
+            camera_pos = (0, 500, 350)
     
     # Rotate player left (A key)
     if key == b'a':
@@ -1091,7 +1096,7 @@ def setupCamera():
         
         # Position the camera and set its orientation
         gluLookAt(rotated_x, rotated_y, cam_z,  # Camera position
-                0, 0, 0,  # Look-at target
+                player_pos[0], player_pos[1], player_pos[2],  # Look-at target (player)
                 0, 0, 1)  # Up vector (z-axis)
     else:  # First person
         # Calculate look-at point based on player angle (match dart direction)
