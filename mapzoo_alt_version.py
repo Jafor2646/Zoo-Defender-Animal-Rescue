@@ -508,84 +508,117 @@ def draw_player():
     glTranslatef(player_pos[0], player_pos[1], player_pos[2])
     glRotatef(player_angle, 0, 0, 1)  # Rotate in XY plane
 
-    # Main body - upright cylinder
-    glColor3f(0.2, 0.5, 0.2)  # Green color
     quad = gluNewQuadric()
-    gluCylinder(quad, 10, 10, 40, 8, 1)  # Simple cylinder body
 
-    # Head (only if not in first-person view)
-    if camera_mode != "first_person":
+    if camera_mode == "third_person":
+        # Main body - upright cylinder
+        glColor3f(0.2, 0.5, 0.2)  # Green color
+        gluCylinder(quad, 10, 10, 40, 8, 1)  # Simple cylinder body
+
+        # Head
         glColor3f(0.3, 0.3, 0.3)  # Dark gray
         glPushMatrix()
         glTranslatef(0, 0, 40)  # Top of cylinder
         glutSolidSphere(8, 8, 8)  # Simple sphere for head
         glPopMatrix()
 
-    # Legs
-    glColor3f(0.2, 0.5, 0.2)  # Match body color
-    # Left leg
-    glPushMatrix()
-    glTranslatef(-5, 0, 0)  # Left side
-    gluCylinder(quad, 3, 3, 20, 8, 1)  # Upper leg
-    glTranslatef(0, 2, 0)  # Foot points forward
-    glColor3f(0.3, 0.3, 0.3)  # Dark gray for shoes
-    glutSolidCube(6)
+        # Legs
+        glColor3f(0.2, 0.5, 0.2)  # Match body color
+        # Left leg
+        glPushMatrix()
+        glTranslatef(-5, 0, 0)  # Left side
+        gluCylinder(quad, 3, 3, 20, 8, 1)  # Upper leg
+        glTranslatef(0, 2, 0)  # Foot points forward
+        glColor3f(0.3, 0.3, 0.3)  # Dark gray for shoes
+        glutSolidCube(6)
+        glPopMatrix()
+
+        # Right leg
+        glPushMatrix()
+        glTranslatef(5, 0, 0)  # Right side
+        glColor3f(0.2, 0.5, 0.2)
+        gluCylinder(quad, 3, 3, 20, 8, 1)
+        glTranslatef(0, 2, 0)
+        glColor3f(0.3, 0.3, 0.3)
+        glutSolidCube(6)
+        glPopMatrix()
+
+        # Arms and hands positioned to hold the gun
+        glPushMatrix()
+        glTranslatef(0, 6, 25)  # Move to chest height and slightly forward
+
+        # Left arm
+        glColor3f(0.2, 0.5, 0.2)
+        glPushMatrix()
+        glTranslatef(-10, -2, 0)  # Position for holding gun
+        glRotatef(30, 0, 0, 1)  # Angle arm to hold gun
+        gluCylinder(quad, 3, 3, 12, 8, 1)
+        glTranslatef(0, 0, 12)
+        glColor3f(0.8, 0.6, 0.4)  # Hand color
+        glutSolidSphere(4, 8, 8)
+        glPopMatrix()
+
+        # Right arm
+        glColor3f(0.2, 0.5, 0.2)
+        glPushMatrix()
+        glTranslatef(10, -2, 0)  # Position for holding gun
+        glRotatef(-30, 0, 0, 1)  # Angle arm to hold gun
+        gluCylinder(quad, 3, 3, 12, 8, 1)
+        glTranslatef(0, 0, 12)
+        glColor3f(0.8, 0.6, 0.4)  # Hand color
+        glutSolidSphere(4, 8, 8)
+        glPopMatrix()
+
+        # Gun between hands, aligned with shooting direction
+        glColor3f(0.4, 0.4, 0.4)  # Gray
+        glPushMatrix()
+        glTranslatef(0, 10, 6)  # Position between hands
+        glRotatef(-90, 1, 0, 0)  # Point gun forward
+        gluCylinder(quad, 2.5, 2, 22, 8, 1)  # Gun barrel (cylinder)
+        # Gun sight on top
+        glPushMatrix()
+        glTranslatef(0, 0, 10)
+        glScalef(1, 1, 0.3)
+        glutSolidCube(4)
+        glPopMatrix()
+        glPopMatrix()  # End gun
+
+        glPopMatrix()  # End arms assembly
+
+    else:  # First-person mode
+        # Only draw hands and gun in front of camera
+        glPushMatrix()
+        # Position hands and gun in front of camera (tweak as needed)
+        glTranslatef(0, 18, 18)
+        glRotatef(-10, 1, 0, 0)
+        # Left hand
+        glPushMatrix()
+        glTranslatef(-4, 0, 0)
+        glColor3f(0.8, 0.6, 0.4)
+        glutSolidSphere(3.5, 8, 8)
+        glPopMatrix()
+        # Right hand
+        glPushMatrix()
+        glTranslatef(4, 0, 0)
+        glColor3f(0.8, 0.6, 0.4)
+        glutSolidSphere(3.5, 8, 8)
+        glPopMatrix()
+        # Gun (barrel)
+        glColor3f(0.4, 0.4, 0.4)
+        glPushMatrix()
+        glTranslatef(0, 4, 0)
+        glRotatef(-90, 1, 0, 0)
+        gluCylinder(quad, 2.5, 2, 18, 8, 1)
+        # Gun sight
+        glPushMatrix()
+        glTranslatef(0, 0, 8)
+        glScalef(1, 1, 0.3)
+        glutSolidCube(3)
+        glPopMatrix()
+        glPopMatrix()  # End gun
+        glPopMatrix()  # End hands/gun
+
     glPopMatrix()
-
-    # Right leg
-    glPushMatrix()
-    glTranslatef(5, 0, 0)  # Right side
-    glColor3f(0.2, 0.5, 0.2)
-    gluCylinder(quad, 3, 3, 20, 8, 1)
-    glTranslatef(0, 2, 0)
-    glColor3f(0.3, 0.3, 0.3)
-    glutSolidCube(6)
-    glPopMatrix()
-
-    # Arms and hands positioned to hold the gun
-    glPushMatrix()
-    glTranslatef(0, 6, 25)  # Move to chest height and slightly forward
-
-    # Left arm
-    glColor3f(0.2, 0.5, 0.2)
-    glPushMatrix()
-    glTranslatef(-10, -2, 0)  # Position for holding gun
-    glRotatef(30, 0, 0, 1)  # Angle arm to hold gun
-    gluCylinder(quad, 3, 3, 12, 8, 1)
-    glTranslatef(0, 0, 12)
-    glColor3f(0.8, 0.6, 0.4)  # Hand color
-    glutSolidSphere(4, 8, 8)
-    glPopMatrix()
-
-    # Right arm
-    glColor3f(0.2, 0.5, 0.2)
-    glPushMatrix()
-    glTranslatef(10, -2, 0)  # Position for holding gun
-    glRotatef(-30, 0, 0, 1)  # Angle arm to hold gun
-    gluCylinder(quad, 3, 3, 12, 8, 1)
-    glTranslatef(0, 0, 12)
-    glColor3f(0.8, 0.6, 0.4)  # Hand color
-    glutSolidSphere(4, 8, 8)
-    glPopMatrix()
-
-    # Gun between hands, aligned with shooting direction
-    glColor3f(0.4, 0.4, 0.4)  # Gray
-    glPushMatrix()
-    glTranslatef(0, 10, 6)  # Position between hands
-    gluCylinder(quad, 3, 2, 20, 8, 1)  # Gun barrel (cylinder)
-    
-    # Gun sight on top
-    glPushMatrix()
-    glTranslatef(0, 0, 10)  # Middle of barrel
-    glScalef(1, 1, 0.3)
-    glutSolidCube(4)
-    glPopMatrix()
-
-    glPopMatrix()  # End gun
-
-    glPopMatrix()  # End arms assembly
-    glPopMatrix()
-
 
 def draw_shapes():
     # Draw environment first
@@ -946,13 +979,13 @@ def keyboardListener(key, x, y):
     # Player movement
     if key == b'w':  # Forward
         angle_rad = player_angle * math.pi / 180
-        player_pos[0] += math.cos(angle_rad) * player_speed
-        player_pos[1] += math.sin(angle_rad) * player_speed
+        player_pos[0] += -math.sin(angle_rad) * player_speed
+        player_pos[1] += math.cos(angle_rad) * player_speed
     
     if key == b's':  # Backward
         angle_rad = player_angle * math.pi / 180
-        player_pos[0] -= math.cos(angle_rad) * player_speed
-        player_pos[1] -= math.sin(angle_rad) * player_speed
+        player_pos[0] -= -math.sin(angle_rad) * player_speed
+        player_pos[1] -= math.cos(angle_rad) * player_speed
     
     # Add food to feeding station
     if key == b'f':
@@ -1056,11 +1089,11 @@ def setupCamera():
                 0, 0, 0,  # Look-at target
                 0, 0, 1)  # Up vector (z-axis)
     else:  # First person
-        # Calculate look-at point based on player angle
+        # Calculate look-at point based on player angle (match dart direction)
         angle_rad = player_angle * math.pi / 180
-        look_x = player_pos[0] + 100 * math.cos(angle_rad)
-        look_y = player_pos[1] + 100 * math.sin(angle_rad)
-        look_z = player_pos[2] + 90
+        look_x = player_pos[0] + 100 * -math.sin(angle_rad)
+        look_y = player_pos[1] + 100 * math.cos(angle_rad)
+        look_z = player_pos[2] + 40  # Look straight ahead at gun height
 
         # Position camera slightly above player's head
         gluLookAt(player_pos[0], player_pos[1], player_pos[2] + 40,
