@@ -992,21 +992,26 @@ def keyboardListener(key, x, y):
         player_pos[0] -= -math.sin(angle_rad) * player_speed
         player_pos[1] -= math.cos(angle_rad) * player_speed
     
-    # Add food to feeding station
+    # Add food to feeding station or feed selected animal
     if key == b'f':
-        # Check if player is near a feeding station
-        for i, habitat in enumerate(habitats):
-            feeding_x = habitat["center"][0] + 50  # Feeding station offset
-            feeding_y = habitat["center"][1] - 50
-            
-            dist = math.sqrt((player_pos[0] - feeding_x)**2 + 
-                           (player_pos[1] - feeding_y)**2)
-            
-            if dist < 50:  # Close enough to feeding station
-                if currency >= feed_cost:
-                    FOOD_LEVEL[i] += 5  # Add food units
-                    currency -= feed_cost
-                    break
+        if selected_animal_index is not None and not game_over:
+            animal = animals[selected_animal_index]
+            if not animal.dead and not animal.captured and currency >= feed_cost:
+                animal.feed()
+                currency -= feed_cost
+        else:
+            # Check if player is near a feeding station
+            for i, habitat in enumerate(habitats):
+                feeding_x = habitat["center"][0] + 50  # Feeding station offset
+                feeding_y = habitat["center"][1] - 50
+                dist = math.sqrt((player_pos[0] - feeding_x)**2 + 
+                               (player_pos[1] - feeding_y)**2)
+                if dist < 50:  # Close enough to feeding station
+                    if currency >= feed_cost:
+                        FOOD_LEVEL[i] += 5  # Add food units
+                        currency -= feed_cost
+                        break
+
 def specialKeyListener(key, x, y):
     global camera_pos, camera_angle
     DEFAULT_CAM_Y = 500
@@ -1250,17 +1255,6 @@ def showScreen():
     for i, habitat in enumerate(habitats):
         x, y, z = habitat["center"]
         draw_text(x + 500, y + 400, habitat["name"])
-        
-        # Show food level for each habitat
-        feeding_x = habitat["center"][0] + 50  # Feeding station offset
-        feeding_y = habitat["center"][1] - 50
-        
-        # Convert to screen coordinates (rough approximation)
-        screen_x = 500 + feeding_x / 2
-        screen_y = 400 + feeding_y / 2
-        
-        # Draw food level text near feeding stations
-        draw_text(screen_x, screen_y, f"Food: {FOOD_LEVEL[i]}")
     # Display game info
     draw_text(10, 770, f"Zoo Defender: Animal Rescue")
     draw_text(10, 740, f"Score: {game_score}  |  Currency: ${currency}")
